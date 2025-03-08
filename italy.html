@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viaggio in Italia !</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"/>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #f0f4f8;
+        }
+        header {
+            background: linear-gradient(90deg, #008C45 33%, #F4F5F0 33%, #F4F5F0 66%, #CD212A 66%);
+            color: black;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        #map {
+            flex: 3;
+            height: calc(100vh - 80px);
+        }
+        .sidebar {
+            flex: 2;
+            background: white;
+            padding: 20px;
+            box-shadow: -2px 0 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .info-box {
+            flex: 1;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        .calendar {
+            flex: 1;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+	.paris { background: rgba(200, 120, 110, 0.3); } /* Terracotta Pink */
+	.milan { background: rgba(180, 210, 160, 0.3); } /* Olive Green */
+	.palermo { background: rgba(130, 180, 210, 0.3); } /* Mediterranean Blue */
+	.catania { background: rgba(230, 190, 150, 0.3); } /* Sunlit Beige */
+	.naples { background: rgba(160, 140, 180, 0.3); } /* Lavender Gray */
+	.bologna { background: rgba(240, 200, 120, 0.3); } /* Golden Yellow */
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Viaggio in Italia !</h1>
+    </header>
+    <div class="container">
+        <div id="map"></div>
+        <div class="sidebar">
+            <div class="info-box" id="infoBox">
+                <h2 id="infoTitle">Trip Overview</h2>
+                <div id="infoContent">
+                    <p>Welcome to your Italy and Sicily adventure! Click on a location or route to see detailed information.</p>
+                    <p><strong>Tip:</strong> Click on the red lines for travel info.</p>
+                </div>
+            </div>
+            <div class="calendar">
+                <h3>Trip Calendar</h3>
+                <ul>
+                   <li class="paris"><strong>7th July</strong>: Paris → Milan</li>
+        <li class="milan"><strong>8th July</strong>: Milan</li>
+        <li class="milan"><strong>9th July</strong>: Milan → Palermo (overnight)</li>
+        <li class="palermo"><strong>10th July</strong>: Palermo</li>
+        <li class="palermo"><strong>11th July</strong>: Palermo</li>
+        <li class="palermo"><strong>12th July</strong>: Palermo</li>
+        <li class="palermo"><strong>13th July</strong>: Palermo → Catania</li>
+        <li class="catania"><strong>14th July</strong>: Catania</li>
+        <li class="catania"><strong>15th July</strong>: Catania</li>
+        <li class="catania"><strong>16th July</strong>: Catania → Palermo → Naples (overnight ferry)</li>
+        <li class="naples"><strong>17th July</strong>: Naples</li>
+        <li class="naples"><strong>18th July</strong>: Naples → Bologna</li>
+        <li class="bologna"><strong>19th July</strong>: Bologna</li>
+        <li class="bologna"><strong>20th July</strong>: Bologna</li>
+        <li class="bologna"><strong>21st July</strong>: Bologna → Milan → Paris</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        const map = L.map('map').setView([41.9028, 12.4964], 5);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Travel routes with detailed timing and pricing
+        const routes = [
+            {
+                name: "Paris → Milan",
+                coords: [[48.8566, 2.3522], [45.4642, 9.1900]],
+                details: `
+                    <strong>Paris → Milan</strong>
+                    <ul>
+                        <li><strong>Date:</strong> 7th July</li>
+                        <li><strong>Time:</strong> 15:00 - 22:00 (7 hours)</li>
+                        <li><strong>Cost:</strong> €50-100</li>
+                        <li><strong>Mode:</strong> High-speed train (TGV/Frecciarossa)</li>
+                    </ul>
+                `
+            },
+            {
+                name: "Milan → Palermo",
+                coords: [[45.4642, 9.1900], [43.7696, 11.2558], [41.9028, 12.4964], [40.8518, 14.2681], [39.3088, 16.2500], [38.1938, 15.5550], [38.1157, 13.3615]],
+                details: `
+                    <strong>Milan → Palermo (Overnight Train)</strong>
+                    <ul>
+                        <li><strong>Date:</strong> 9th July</li>
+                        <li><strong>Time:</strong> 20:00 - 08:00 (12 hours)</li>
+                        <li><strong>Cost:</strong> €50-80</li>
+                        <li><strong>Mode:</strong> Direct night train (Trenitalia)</li>
+                        <li><strong>Route:</strong> Milan → Florence → Rome → Naples → Cosenza → Messina → Palermo</li>
+                    </ul>
+                `
+            },
+            {
+                name: "Palermo ↔ Catania",
+                coords: [[38.1157, 13.3615], [37.5079, 15.0830]],
+                details: `
+                    <strong>Palermo → Catania</strong>
+                    <ul>
+                        <li><strong>Date:</strong> 13th July</li>
+                        <li><strong>Time:</strong> 09:00 - 12:00 (3 hours)</li>
+                        <li><strong>Cost:</strong> €10-15</li>
+                        <li><strong>Mode:</strong> Regional train</li>
+                    </ul>
+                    <hr>
+                    <strong>Catania → Palermo</strong>
+                    <ul>
+                        <li><strong>Date:</strong> 16th July</li>
+                        <li><strong>Time:</strong> 15:00 - 18:00 (3 hours)</li>
+                        <li><strong>Cost:</strong> €10-15</li>
+                        <li><strong>Mode:</strong> Regional train</li>
+                    </ul>
+                `
+            },
+            {
+                name: "Palermo → Naples",
+                coords: [[38.1157, 13.3615], [40.8518, 14.2681]],
+                details: `
+                    <strong>Palermo → Naples (Overnight Ferry)</strong>
+                    <ul>
+                        <li><strong>Date:</strong> 16th July</li>
+                        <li><strong>Time:</strong> 20:00 - 07:00 (11 hours)</li>
+                        <li><strong>Cost:</strong> €30-120</li>
+                        <li><strong>Mode:</strong> Grimaldi Lines/Tirrenia ferry</li>
+                    </ul>
+                `
+            },
+            {
+                name: "Naples → Bologna",
+                coords: [[40.8518, 14.2681], [44.4949, 11.3426]],
+                details: `
+                    <strong>Naples → Bologna</strong>
+                    <ul>
+                        <li><strong>Date:</strong> 18th July</li>
+                        <li><strong>Time:</strong> 16:00 - 20:00 (4 hours)</li>
+                        <li><strong>Cost:</strong> €30-50</li>
+                        <li><strong>Mode:</strong> High-speed train (Frecciarossa)</li>
+                    </ul>
+                `
+            },
+            {
+                name: "Bologna → Milan → Paris",
+                coords: [[44.4949, 11.3426], [45.4642, 9.1900], [48.8566, 2.3522]],
+                details: `
+                    <strong>Bologna → Milan → Paris</strong>
+                    <ul>
+                        <li><strong>Date:</strong> 21st July</li>
+                        <li><strong>Time:</strong> 09:00 - 17:00 (8 hours total)</li>
+                        <li><strong>Cost:</strong> €65-120</li>
+                        <li><strong>Mode:</strong> High-speed trains (Frecciarossa + TGV)</li>
+                    </ul>
+                `
+            }
+        ];
+
+        // Add routes to map with pop-ups
+        routes.forEach(route => {
+            const polyline = L.polyline(route.coords, {
+                color: route.name.includes('Ferry') ? '#3498db' : '#e74c3c',
+                weight: 4
+            }).addTo(map);
+
+            // Add pop-up to the route
+            polyline.bindPopup(route.details, {
+                className: 'route-popup'
+            });
+
+            // Update info box when clicking the route
+            polyline.on('click', () => {
+                document.getElementById('infoTitle').innerText = route.name;
+                document.getElementById('infoContent').innerHTML = route.details;
+                document.getElementById('infoBox').className = `info-box ${route.colorClass}`;
+            });
+        });
+
+        // Locations data with detailed information
+        const locations = [
+            {
+                name: "Paris",
+                coords: [48.8566, 2.3522],
+                details: `
+                    <ul>
+                        <li><strong>Date:</strong> 7th July</li>
+                        <li><strong>Departure:</strong> 15:00</li>
+                        <li><strong>Train to Milan:</strong> 7 hours, €50-100</li>
+                        <li><strong>Accommodation:</strong> None (departure day)</li>
+                    </ul>
+                `,
+                colorClass: "paris"
+            },
+            {
+                name: "Milan",
+                coords: [45.4642, 9.1900],
+                details: `
+                    <ul>
+                        <li><strong>Dates:</strong> 7th-9th July</li>
+                        <li><strong>Accommodation:</strong> Ostello Bello Grande (2 nights)</li>
+                        <li><strong>Highlights:</strong> Duomo di Milano, The Last Supper, Navigli District</li>
+                        <li><strong>Departure:</strong> 9th July 20:00 → Palermo (overnight train)</li>
+                    </ul>
+                `,
+                colorClass: "milan"
+            },
+            {
+                name: "Palermo",
+                coords: [38.1157, 13.3615],
+                details: `
+                    <ul>
+                        <li><strong>Dates:</strong> 10th-12th July</li>
+                        <li><strong>Accommodation:</strong> Hostel Palermo Central (3 nights)</li>
+                        <li><strong>Highlights:</strong> Ballarò Market, Monreale Cathedral, Mondello Beach</li>
+                        <li><strong>Departure:</strong> 13th July 09:00 → Catania (3 hours, €10-15)</li>
+                    </ul>
+                `,
+                colorClass: "palermo"
+            },
+            {
+                name: "Catania",
+                coords: [37.5079, 15.0830],
+                details: `
+                    <ul>
+                        <li><strong>Dates:</strong> 13th-16th July</li>
+                        <li><strong>Accommodation:</strong> Ostello degli Elefanti (3 nights)</li>
+                        <li><strong>Highlights:</strong> Mount Etna hike, Taormina, Fish Market</li>
+                        <li><strong>Departure:</strong> 16th July 15:00 → Palermo (3 hours, €10-15)</li>
+                    </ul>
+                `,
+                colorClass: "catania"
+            },
+            {
+                name: "Naples",
+                coords: [40.8518, 14.2681],
+                details: `
+                    <ul>
+                        <li><strong>Date:</strong> 17th July</li>
+                        <li><strong>Accommodation:</strong> Hostel of the Sun (1 night)</li>
+                        <li><strong>Highlights:</strong> Pompeii ruins, Neapolitan pizza, Castel dell’Ovo</li>
+                        <li><strong>Departure:</strong> 18th July 16:00 → Bologna (4 hours, €30-50)</li>
+                    </ul>
+                `,
+                colorClass: "naples"
+            },
+            {
+                name: "Bologna",
+                coords: [44.4949, 11.3426],
+                details: `
+                    <ul>
+                        <li><strong>Dates:</strong> 18th-20th July</li>
+                        <li><strong>Accommodation:</strong> Dopa Hostel (3 nights)</li>
+                        <li><strong>Highlights:</strong> Asinelli Tower, Quadrilatero Market, Tagliatelle al Ragù</li>
+                        <li><strong>Departure:</strong> 21st July 09:00 → Milan → Paris (8 hours, €65-120)</li>
+                    </ul>
+                `,
+                colorClass: "bologna"
+            }
+        ];
+
+        // Add interactive markers with default pin shape
+        locations.forEach(loc => {
+            L.marker(loc.coords)
+                .addTo(map)
+                .on('click', () => {
+                    document.getElementById('infoTitle').innerText = loc.name;
+                    document.getElementById('infoContent').innerHTML = loc.details;
+                    document.getElementById('infoBox').className = `info-box ${loc.colorClass}`;
+                });
+        });
+
+        // Reset to trip overview when clicking map
+        map.on('click', () => {
+            document.getElementById('infoTitle').innerText = "Trip Overview";
+            document.getElementById('infoContent').innerHTML = `
+                <p>Welcome to your Italy and Sicily adventure! Click on a location or route to see detailed information.</p>
+                <p><strong>Tip:</strong> Click on the red lines for travel info.</p>
+            `;
+            document.getElementById('infoBox').className = "info-box";
+        });
+
+        // Custom CSS for route pop-ups
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .route-popup {
+                background: white;
+                border: 2px solid #e74c3c;
+                border-radius: 8px;
+                padding: 10px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
